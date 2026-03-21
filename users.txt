@@ -1,0 +1,3 @@
+U1,Andrei Popescu,CLIENT
+U2,Elena Ionescu,CLIENT
+A1,Dorin Stefan,ADMIN
