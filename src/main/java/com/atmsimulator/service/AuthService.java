@@ -11,14 +11,13 @@ public class AuthService {
     private final AccountRepository accountRepo = new AccountRepository();
     private final UserRepository userRepo = new UserRepository();
 
-    // Returnează contul dacă login-ul e corect, altfel aruncă eroare
     public Account login(String accountId, String pin) {
         List<Account> accounts = accountRepo.findAll();
 
         for (Account acc : accounts) {
             if (acc.getAccountId().equals(accountId)) {
                 if (acc.getPin().equals(pin)) {
-                    return acc; // Login cu succes
+                    return acc;
                 } else {
                     throw new RuntimeException("PIN incorect!");
                 }

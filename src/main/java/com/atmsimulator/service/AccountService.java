@@ -20,13 +20,10 @@ public class AccountService {
             throw new RuntimeException("Fonduri insuficiente!");
         }
 
-        // 2. Actualizăm modelul
         account.setBalance(account.getBalance().subtract(amount));
 
-        // 3. Salvăm noul sold (trebuie să actualizăm toată lista în fișier)
         updateAccountInFile(account);
 
-        // 4. Creăm și salvăm istoricul
         Transaction t = new Transaction(UUID.randomUUID().toString(), account.getAccountId(),
                 "RETRAGERE", amount, account.getCurrency(), LocalDateTime.now());
         transactionRepo.save(t);
@@ -41,15 +38,14 @@ public class AccountService {
         transactionRepo.save(t);
     }
 
-    // Metodă internă ajutătoare pentru a rescrie fișierul cu contul actualizat
     private void updateAccountInFile(Account updatedAccount) {
         List<Account> allAccounts = accountRepo.findAll();
         for (int i = 0; i < allAccounts.size(); i++) {
             if (allAccounts.get(i).getAccountId().equals(updatedAccount.getAccountId())) {
-                allAccounts.set(i, updatedAccount); // Înlocuim contul vechi cu cel nou
+                allAccounts.set(i, updatedAccount);
                 break;
             }
         }
-        accountRepo.saveAll(allAccounts); // Rescriem fișierul
+        accountRepo.saveAll(allAccounts);
     }
 }

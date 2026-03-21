@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 
 public class Transaction {
     private String transactionId;
-    private String accountId;     // Contul pe care s-a făcut operațiunea
-    private String type;          // "RETRAGERE", "DEPUNERE", "TRANSFER"
+    private String accountId;
+    private String type;
     private BigDecimal amount;
     private String currency;
     private LocalDateTime timestamp;
@@ -20,7 +20,6 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    // Getteri (O tranzacție, odată creată, nu se mai modifică, deci NU avem setteri)
     public String getTransactionId() { return transactionId; }
     public String getAccountId() { return accountId; }
     public String getType() { return type; }

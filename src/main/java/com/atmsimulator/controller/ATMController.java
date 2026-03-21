@@ -29,13 +29,11 @@ public class ATMController {
             String pin = scanner.nextLine();
 
             try {
-                // 1. Încercăm să ne logăm
                 Account loggedInAccount = authService.login(accountId, pin);
                 User owner = authService.getOwnerDetails(loggedInAccount.getUserId());
 
                 System.out.println("\nAutentificare reusita! Bun venit, " + owner.getFullName() + "!");
 
-                // 2. Direcționăm utilizatorul în funcție de ROL
                 if (owner.getRole().equals("ADMIN")) {
                     showAdminMenu();
                 } else {
@@ -43,7 +41,6 @@ public class ATMController {
                 }
 
             } catch (RuntimeException e) {
-                // Dacă Service-ul a aruncat o eroare (ex: PIN greșit), o afișăm aici frumos
                 System.out.println("EROARE: " + e.getMessage());
             }
         }
@@ -56,7 +53,7 @@ public class ATMController {
             System.out.println("1. Interogare Sold");
             System.out.println("2. Retragere Numerar");
             System.out.println("3. Depunere Numerar");
-            System.out.println("4. Extras de Cont (Ultimele 5 tranzactii)");
+            System.out.println("4. Extras de Cont");
             System.out.println("5. Iesire (Deconectare)");
             System.out.print("Alegeti o optiune: ");
 

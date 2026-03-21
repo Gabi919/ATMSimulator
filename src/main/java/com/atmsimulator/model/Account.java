@@ -3,11 +3,11 @@ package com.atmsimulator.model;
 import java.math.BigDecimal;
 
 public class Account {
-    private String accountId;   // Ex: "RO12345"
-    private String userId;      // Legătura către User (proprietarul contului)
+    private String accountId;
+    private String userId;
     private String pin;
     private BigDecimal balance;
-    private String currency;    // Ex: "RON", "EUR"
+    private String currency;
 
     public Account(String accountId, String userId, String pin, BigDecimal balance, String currency) {
         this.accountId = accountId;
