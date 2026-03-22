@@ -29,4 +29,22 @@ public class AuthService {
     public User getOwnerDetails(String userId) {
         return userRepo.findById(userId);
     }
+
+    public void changePin(Account account, String oldPin, String newPin) {
+        if (!account.getPin().equals(oldPin)) {
+            throw new RuntimeException("PIN-ul actual este incorect!");
+        }
+
+        if (oldPin.equals(newPin)) {
+            throw new RuntimeException("Noul PIN nu poate fi identic cu cel vechi!");
+        }
+
+        if (!newPin.matches("\\d{4}")) {
+            throw new RuntimeException("Noul PIN trebuie să conțină exact 4 cifre!");
+        }
+
+        account.setPin(newPin);
+
+        accountRepo.updateInFile(account);
+    }
 }

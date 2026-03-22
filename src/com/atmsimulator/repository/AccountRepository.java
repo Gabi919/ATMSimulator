@@ -33,4 +33,15 @@ public class AccountRepository {
             System.err.println("Eroare la scrierea conturilor: " + e.getMessage());
         }
     }
+
+    public void updateInFile(Account updatedAccount) {
+        List<Account> allAccounts = findAll();
+        for (int i = 0; i < allAccounts.size(); i++) {
+            if (allAccounts.get(i).getAccountId().equals(updatedAccount.getAccountId())) {
+                allAccounts.set(i, updatedAccount);
+                break;
+            }
+        }
+        saveAll(allAccounts);
+    }
 }

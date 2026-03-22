@@ -17,14 +17,12 @@ public class Account {
         this.currency = currency;
     }
 
-    // Getteri
     public String getAccountId() { return accountId; }
     public String getUserId() { return userId; }
     public String getPin() { return pin; }
     public BigDecimal getBalance() { return balance; }
     public String getCurrency() { return currency; }
 
-    // Setteri
     public void setPin(String pin) { this.pin = pin; }
 
     public void setBalance(BigDecimal balance) {

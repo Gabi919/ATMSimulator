@@ -19,8 +19,8 @@ public class ATMController {
 
     public void start() {
         while (true) {
-            System.out.println("\n=== BINE ATI VENIT LA ATM SIMULATOR ===");
-            System.out.print("Introduceti ID Cont (sau 'exit' pentru a opri): ");
+            System.out.println("\nATM SIMULATOR");
+            System.out.print("Introduceti ID Cont (sau 'exit' pentru a iesi): ");
             String accountId = scanner.nextLine();
 
             if (accountId.equalsIgnoreCase("exit")) break;
@@ -54,7 +54,9 @@ public class ATMController {
             System.out.println("2. Retragere Numerar");
             System.out.println("3. Depunere Numerar");
             System.out.println("4. Extras de Cont");
-            System.out.println("5. Iesire (Deconectare)");
+            System.out.println("5. Transfer bancar");
+            System.out.println("6. Schimbare PIN");
+            System.out.println("7. Iesire (Deconectare)");
             System.out.print("Alegeti o optiune: ");
 
             String option = scanner.nextLine();
@@ -77,7 +79,7 @@ public class ATMController {
                         System.out.println("SUCCES: Ati depus " + depositAmount + " " + account.getCurrency());
                         break;
                     case "4":
-                        System.out.println("--- ULTIMELE TRANZACTII ---");
+                        System.out.println("ULTIMELE TRANZACTII");
                         List<Transaction> istoric = adminService.getTransactionsForAccount(account.getAccountId());
                         if (istoric.isEmpty()) {
                             System.out.println("Nu exista tranzactii.");
@@ -88,6 +90,39 @@ public class ATMController {
                         }
                         break;
                     case "5":
+                        System.out.print("Introduceti ID-ul contului destinatie : ");
+                        String toAccountId = scanner.nextLine();
+
+                        System.out.print("Suma de transferat: ");
+                        BigDecimal transferAmount = new BigDecimal(scanner.nextLine());
+                        accountService.transfer(account, toAccountId, transferAmount);
+
+                        System.out.println("SUCCES: Ati transferat " + transferAmount + " " + account.getCurrency() + " catre " + toAccountId);
+                        break;
+                    case "6":
+                        System.out.println("\nSCHIMBARE PIN");
+                        System.out.print("Introduceți PIN-ul actual: ");
+                        String currentPin = scanner.nextLine();
+
+                        System.out.print("Introduceți NOUL PIN (4 cifre): ");
+                        String pin1 = scanner.nextLine();
+
+                        System.out.print("Confirmați NOUL PIN: ");
+                        String pin2 = scanner.nextLine();
+
+                        try {
+                            if (!pin1.equals(pin2)) {
+                                throw new RuntimeException("Cele două PIN-uri noi nu coincid!");
+                            }
+
+                            authService.changePin(account, currentPin, pin1);
+
+                            System.out.println("SUCCES: PIN-ul a fost schimbat cu succes!");
+                        } catch (Exception e) {
+                            System.out.println("EROARE: " + e.getMessage());
+                        }
+                        break;
+                    case "7":
                         running = false;
                         System.out.println("La revedere!");
                         break;
