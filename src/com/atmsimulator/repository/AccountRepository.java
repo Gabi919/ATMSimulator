@@ -44,4 +44,26 @@ public class AccountRepository {
         }
         saveAll(allAccounts);
     }
+
+    public void deleteById(String accountId) {
+        List<Account> accounts = findAll();
+
+        boolean removed = accounts.removeIf(acc -> acc.getAccountId().equals(accountId));
+
+        if (removed) {
+            saveAll(accounts);
+        } else {
+            throw new RuntimeException("Contul nu a fost găsit în baza de date!");
+        }
+    }
+
+    public void save(Account newAccount) {
+
+        List<Account> allAccounts = findAll();
+
+        allAccounts.add(newAccount);
+
+        saveAll(allAccounts);
+    }
+
 }

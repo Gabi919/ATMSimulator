@@ -3,9 +3,7 @@ package com.atmsimulator.repository;
 import com.atmsimulator.model.Account;
 import com.atmsimulator.model.User;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,5 +37,30 @@ public class UserRepository {
             }
         }
         return null;
+    }
+
+
+    private void saveAll(List<User> users) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("users.txt"))) {
+            for (User u : users) {
+                String line = u.getUserId() + "," +
+                        u.getFullName() + "," +
+                        u.getRole();
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Eroare la salvarea utilizatorilor: " + e.getMessage());
+        }
+    }
+
+
+    public void save(User newUser) {
+
+        List<User> allUsers = findAll();
+
+        allUsers.add(newUser);
+
+        saveAll(allUsers);
     }
 }

@@ -8,7 +8,9 @@ import com.atmsimulator.service.AdminService;
 import com.atmsimulator.service.AuthService;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class ATMController {
@@ -49,7 +51,7 @@ public class ATMController {
     private void showClientMenu(Account account) {
         boolean running = true;
         while (running) {
-            System.out.println("\n--- MENIU CLIENT (" + account.getCurrency() + ") ---");
+            System.out.println("\nMENIU CLIENT (" + account.getCurrency() + ")\n");
             System.out.println("1. Interogare Sold");
             System.out.println("2. Retragere Numerar");
             System.out.println("3. Depunere Numerar");
@@ -79,13 +81,28 @@ public class ATMController {
                         System.out.println("SUCCES: Ati depus " + depositAmount + " " + account.getCurrency());
                         break;
                     case "4":
-                        System.out.println("ULTIMELE TRANZACTII");
+                        System.out.println("\nEXTRAS DE CONT");
                         List<Transaction> istoric = adminService.getTransactionsForAccount(account.getAccountId());
+
                         if (istoric.isEmpty()) {
                             System.out.println("Nu exista tranzactii.");
                         } else {
+                            boolean hasTransactions = false;
                             for (Transaction t : istoric) {
-                                System.out.println(t.getTimestamp() + " | " + t.getType() + " | " + t.getAmount() + " " + t.getCurrency());
+                                String type = t.getType().trim();
+
+                                if (type.equals("RETRAGERE") || type.equals("DEPUNERE") ||
+                                        type.equals("TRANSFER") || type.equals("PRIMIRE TRANSFER")) {
+
+                                    System.out.println(String.format("%-30s", t.getTimestamp()) + " | " +
+                                            String.format("%-16s", type) + " | " +
+                                            String.format("%-7s", t.getAmount()) + " " + t.getCurrency());
+                                    hasTransactions = true;
+                                }
+                            }
+
+                            if (!hasTransactions) {
+                                System.out.println("Nu exista tranzactii financiare de afisat.");
                             }
                         }
                         break;
@@ -141,7 +158,9 @@ public class ATMController {
             System.out.println("\n--- MENIU ADMINISTRATOR ---");
             System.out.println("1. Vezi TOATE tranzactiile din sistem");
             System.out.println("2. Cauta tranzactii dupa ID Cont");
-            System.out.println("3. Iesire (Deconectare)");
+            System.out.println("3. Creaza cont nou");
+            System.out.println("4. Sterge cont existent");
+            System.out.println("5. Iesire (Deconectare)");
             System.out.print("Alegeti o optiune: ");
 
             String option = scanner.nextLine();
@@ -149,20 +168,73 @@ public class ATMController {
             switch (option) {
                 case "1":
                     List<Transaction> all = adminService.getAllSystemTransactions();
-                    System.out.println("S-au gasit " + all.size() + " tranzactii totale.");
+                    System.out.println("TRANZCTII - " + all.size() + " GASITE");
+
+
+                    DateTimeFormatter formatData = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
                     for (Transaction t : all) {
-                        System.out.println(t.getAccountId() + " | " + t.getType() + " | " + t.getAmount());
+                        String date = t.getTimestamp().format(formatData);
+                        String type = t.getType().trim();
+                        String accountId = String.format("%-10s", t.getAccountId());
+
+                        if (type.equals("SCHIMBARE PIN") || type.equals("INCHIDERE CONT")) {
+                            System.out.println(date + " | " + accountId + " | " +
+                                    String.format("%-18s", type) + " | [OPERATIUNE SECURITATE]");
+
+                        } else if (type.equals("CREARE CONT")) {
+                            System.out.println(date + " | " + accountId + " | " +
+                                    String.format("%-18s", type) + " | Sold Initial: " +
+                                    t.getAmount() + " " + t.getCurrency());
+
+                        } else {
+                            System.out.println(date + " | " + accountId + " | " +
+                                    String.format("%-18s", type) + " | " +
+                                    t.getAmount() + " " + t.getCurrency());
+                        }
                     }
                     break;
                 case "2":
                     System.out.print("Introduceti ID Cont client: ");
                     String searchId = scanner.nextLine();
-                    List<Transaction> clientTx = adminService.getTransactionsForAccount(searchId);
-                    for (Transaction t : clientTx) {
+                    List<Transaction> clients = adminService.getTransactionsForAccount(searchId);
+                    for (Transaction t : clients) {
                         System.out.println(t.getType() + " | " + t.getAmount() + " | " + t.getTimestamp());
                     }
                     break;
                 case "3":
+                    System.out.println("\nDESCHIDERE CONT NOU");
+                    System.out.print("Nume complet detinator: ");
+                    String fullName = scanner.nextLine();
+
+                    System.out.print("Setati PIN initial (4 cifre): ");
+                    String newPin = scanner.nextLine();
+
+                    System.out.print("Suma depusa initial: ");
+                    BigDecimal initialSum = new BigDecimal(scanner.nextLine());
+
+                    System.out.print("Moneda contului (RON/EUR/USD/GBP): ");
+                    String currency = scanner.nextLine();
+
+                    try {
+                        adminService.createFullProfile(fullName, newPin, initialSum, currency);
+                        System.out.println("SUCCES: Profilul si contul au fost generate si salvate.");
+                    } catch (Exception e) {
+                        System.out.println("EROARE: " + e.getMessage());
+                    }
+                    break;
+                case "4":
+                    System.out.print("Introduceți ID-ul contului pentru închidere: ");
+                    String idToClose = scanner.nextLine();
+
+                    try {
+                        adminService.closeAccount(idToClose);
+                        System.out.println("SUCCES: Contul a fost închis definitiv.");
+                    } catch (Exception e) {
+                        System.out.println("NOTIFICARE: " + e.getMessage());
+                    }
+                    break;
+                case "5":
                     running = false;
                     break;
                 default:

@@ -1,15 +1,21 @@
 package com.atmsimulator.service;
 
 import com.atmsimulator.model.Account;
+import com.atmsimulator.model.Transaction;
 import com.atmsimulator.model.User;
 import com.atmsimulator.repository.AccountRepository;
+import com.atmsimulator.repository.TransactionRepository;
 import com.atmsimulator.repository.UserRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class AuthService {
     private final AccountRepository accountRepo = new AccountRepository();
     private final UserRepository userRepo = new UserRepository();
+    private final TransactionRepository transactionRepo = new TransactionRepository();
 
     public Account login(String accountId, String pin) {
         List<Account> accounts = accountRepo.findAll();
@@ -46,5 +52,10 @@ public class AuthService {
         account.setPin(newPin);
 
         accountRepo.updateInFile(account);
+
+        Transaction pinChange = new Transaction(UUID.randomUUID().toString(), account.getAccountId(), "SCHIMBARE PIN",
+                                                BigDecimal.ZERO, account.getCurrency(), LocalDateTime.now());
+
+        transactionRepo.save(pinChange);
     }
 }

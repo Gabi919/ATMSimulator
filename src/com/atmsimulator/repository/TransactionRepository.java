@@ -32,7 +32,9 @@ public class TransactionRepository {
                             new BigDecimal(data[3]), data[4], LocalDateTime.parse(data[5])));
                 }
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            System.err.println("Eroare la gasirea tranzacției: " + e.getMessage());
+        }
         return transactions;
     }
 }
